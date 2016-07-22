@@ -9,8 +9,8 @@
 int sensorPin = A0;    // select the input pin for the potentiometer
 int sensorValue = 0;  // variable to store the value coming from the sensor
 int addup = 0;
-int count = 10;
-int topCount = 10;
+int count = 100;
+int topCount = 100;
 
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -62,7 +62,7 @@ void reconnect() {
     if (client.connect(DeviceName)) {
       Serial.println("connected");
       //       Once connected, publish an announcement...
-      // client.publish(DeviceName, "Pressed");
+       client.publish(DeviceName, "Buttons");
       // ... and resubscribe
       client.subscribe(DeviceName);
     } else {
@@ -76,13 +76,20 @@ void reconnect() {
 }
 void loop() {
 
-    count--;
-    sensorValue += analogRead(sensorPin);
+    
+    
+    if(analogRead(sensorPin) >= 200){
+      sensorValue += analogRead(sensorPin);
+      // Serial.println(sensorValue);
+     count--;
+      }
+    
   if (count == 0) {
     count = topCount;
      
-     sensorValue/=topCount;
+     sensorValue/=(topCount);
      sensorValue = (sensorValue / 10 + (sensorValue % 10 > 5)) * 10;
+    
      buttonSort(sensorValue);
   }
 
@@ -99,29 +106,29 @@ void loop() {
 void buttonSort(int inVal) {
 
   byte ID = 0;
-  if (inVal == 1020) {
+  if (inVal == 1030) {
     sendPress(1);
-  } else if (inVal == 930) {
+  } else if (inVal == 930||inVal == 940) {
     sendPress(2);
-  } else if (inVal == 850) {
+  } else if (inVal == 850 || inVal == 850) {
     sendPress(3);
-  } else if (inVal == 780) {
+  } else if (inVal == 790 || inVal == 800) {
     sendPress(4);
   } else if (inVal == 730) {
     sendPress(5);
   } else if (inVal == 680) {
     sendPress(6);
-  } else if (inVal == 630 || inVal == 640) {
+  } else if (inVal == 650 || inVal == 640) {
     sendPress(7);
-  } else if (inVal == 600 || inVal == 590) {
+  } else if (inVal == 600) {
     sendPress(8);
-  } else if (inVal == 570) {
+  } else if (inVal == 580 || inVal == 570) {
     sendPress(9);
-  } else if (inVal == 540) {
+  } else if (inVal == 550 || inVal == 540) {
     sendPress(10);
   } else if (inVal == 510) {
     sendPress(11);
-  } else if (inVal == 490) {
+  } else if (inVal == 500 || inVal == 490) {
     sendPress(12);
   } else if (inVal > 30) {
     Serial.println("not found ");
@@ -133,5 +140,5 @@ void sendPress(byte id) {
     char buf[4];
   Serial.println(id);
   client.publish(DeviceName, itoa(id, buf, 10) );
-  delay(1000);
+  delay(100);
 }
